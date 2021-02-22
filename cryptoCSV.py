@@ -3,12 +3,10 @@ import json
 import csv
 import datetime
 import time
-# import sqlite3
 
 CONFIG_FILENAME = 'config.json'
 QUOTES_FILENAME = 'quotes.csv'
 TIME_FORMAT = "%y/%m/%d %H:%M"
-INTERVAL = 3600
 
 assets = None
 api_key = None
@@ -17,9 +15,9 @@ currency = None
 
 
 def main():
-    assets = get_config()
+    get_config()
     while True:
-        get_quote(assets)
+        get_quote()
         timer()
 
 
@@ -27,18 +25,22 @@ def get_config():
     with open(CONFIG_FILENAME) as config_file:
         data = json.load(config_file)
 
-    global assets = data['currencies']
-    global api_key = data['api_key']
-    global currency_key = data['currency_key']
-    global currency = data['currency']
+    global assets
+    global api_key
+    global currency_key
+    global currency
+    assets = data['currencies']
+    api_key = data['api_key']
+    currency_key = data['currency_key']
+    currency = data['currency']
 
 
-def get_quote(assets):
+def get_quote():
     names_list = []
     quotes_list = []
     for asset_id in assets:
         crypto_url = "https://rest.coinapi.io/v1/assets/{}/?apikey={}".\
-                    format(asset_id, API_KEY)
+                    format(asset_id, api_key)
 
         response = requests.get(crypto_url)
         response = response.json()
@@ -51,7 +53,6 @@ def get_quote(assets):
     quotes_list = remove_brakets(quotes_list)
 
     append_csv(quotes_list, names_list)
-    # append_sql(quotes_list, names_list)
 
 
 def append_csv(quotes, names):
@@ -67,17 +68,19 @@ def append_csv(quotes, names):
                                        quoting=csv.QUOTE_MINIMAL)
             quotes_writer.writerow(["Time", names])
 
-# def append_sql(quotes, names):
-
 
 def timer():
-    time.sleep(INTERVAL)
+    now = datetime.datetime.now()
+    while now.minute != 59:
+        now = datetime.datetime.now()
+        time.sleep(70)
+        continue
     return
 
 
 def convert_ponds(quotes_list):
     currency_url = "http://data.fixer.io/api/latest?access_key={}&format=1"\
-                    format(currency_key)
+        .format(currency_key)
     response = requests.get(currency_url)
     response = response.json()
     conversion_rate = response['rates'][currency] / response['rates']['USD']
