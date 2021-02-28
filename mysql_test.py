@@ -1,4 +1,3 @@
-# TODO Make SQL query('sql') flexible to not just a fixed number of assets
 # TODO Check if any other assets were added after first table creation
 # TODO Remove print funcitions
 # TODO Integrate with cryptoCSV.py
@@ -57,9 +56,12 @@ def create_table(mycursor):
 def insert_row(mycursor, mydb):
     # quotes list will be given by the cryptoCSV file
     quotes_list = [34339.76271, 1326.288021, 0.04720086692, 11.720020426273300]
+    coins = ["BTC", "ETH", "DOGE", "ETC"]
+    coin_list = ", ".join(coins)
+    quote_list = ", ".join(str(q) for q in quotes_list)
 
-    sql = "INSERT INTO assets (BTC, ETH, DOGE, ETC) VALUES (%f, %f, %f, %f)" %\
-        (quotes_list[0], quotes_list[1], quotes_list[2], quotes_list[3])
+    sql = "INSERT INTO assets (%s) VALUES (%s)" %\
+        (coin_list, quote_list)
 
     mycursor.execute(sql)
 
