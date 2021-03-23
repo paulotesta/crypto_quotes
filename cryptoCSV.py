@@ -3,6 +3,7 @@ import json
 import csv
 import datetime
 import time
+import sql_output
 
 CONFIG_FILENAME = 'config.json'
 QUOTES_FILENAME = 'quotes.csv'
@@ -29,10 +30,12 @@ def get_config():
     global api_key
     global currency_key
     global currency
+    global output
     assets = data['currencies']
     api_key = data['api_key']
     currency_key = data['currency_key']
     currency = data['currency']
+    output = data['output']
 
 
 def get_quote():
@@ -49,10 +52,15 @@ def get_quote():
 
     quotes_list = convert_ponds(quotes_list)
 
-    names_list = remove_brakets(names_list)
-    quotes_list = remove_brakets(quotes_list)
+    if output == "sql":
+        sql_output.save_to_database(names_list, quotes_list)
+    elif output == "csv":
+        names_list = remove_brakets(names_list)
+        quotes_list = remove_brakets(quotes_list)
 
-    append_csv(quotes_list, names_list)
+        append_csv(quotes_list, names_list)
+    else:
+        print("Output mode error, please select in config.json the correct output mode (sql or csv)")
 
 
 def append_csv(quotes, names):

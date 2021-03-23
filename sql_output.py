@@ -1,21 +1,17 @@
 # TODO Check if any other assets were added after first table creation
 # TODO Remove print funcitions
-# TODO Integrate with cryptoCSV.py
 
 import mysql.connector
 import json
 
-# assets list will be given by the cryptoCSV file
-assets = ["BTC", "ETH", "DOGE", "ETC"]
-
 CONFIG_FILENAME = 'configSQL.json'
 
 
-def main():
+def save_to_database(assets_names, assets_values):
     load_json()
     db_files = connect_mysql()
-    create_table(db_files[0])
-    insert_row(db_files[0], db_files[1])
+    create_table(db_files[0], assets_names)
+    insert_row(db_files[0], db_files[1], assets_values, assets_names)
     print_table(db_files[0])
 
 
@@ -36,7 +32,7 @@ def connect_mysql():
     return mycursor, mydb
 
 
-def create_table(mycursor):
+def create_table(mycursor, columns):
     mycursor.execute("SHOW TABLES")
 
     table_exists = False
@@ -47,16 +43,13 @@ def create_table(mycursor):
         mycursor.execute("CREATE TABLE assets (\
             time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON" +
                          " UPDATE CURRENT_TIMESTAMP)")
-        for asset in assets:
+        for asset in columns:
             mycursor.execute("ALTER TABLE assets ADD COLUMN \
                               %s FLOAT NOT NULL" % asset)
     return mycursor
 
 
-def insert_row(mycursor, mydb):
-    # quotes list will be given by the cryptoCSV file
-    quotes_list = [34339.76271, 1326.288021, 0.04720086692, 11.720020426273300]
-    coins = ["BTC", "ETH", "DOGE", "ETC"]
+def insert_row(mycursor, mydb, quotes_list, coins):
     coin_list = ", ".join(coins)
     quote_list = ", ".join(str(q) for q in quotes_list)
 
@@ -81,6 +74,3 @@ def print_table(mycursor):
         print("\n")
 
     print("END")
-
-
-main()
