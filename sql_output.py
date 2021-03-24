@@ -1,4 +1,4 @@
-# TODO Check if any other assets were added after first table creation
+
 # TODO Remove print funcitions
 
 import mysql.connector
@@ -12,7 +12,7 @@ def save_to_database(assets_names, assets_values):
     db_files = connect_mysql()
     create_table(db_files[0], assets_names)
     insert_row(db_files[0], db_files[1], assets_values, assets_names)
-    print_table(db_files[0])
+    # print_table(db_files[0])
 
 
 def load_json():
@@ -32,7 +32,7 @@ def connect_mysql():
     return mycursor, mydb
 
 
-def create_table(mycursor, columns):
+def create_table(mycursor, asset_names):
     mycursor.execute("SHOW TABLES")
 
     table_exists = False
@@ -43,10 +43,23 @@ def create_table(mycursor, columns):
         mycursor.execute("CREATE TABLE assets (\
             time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON" +
                          " UPDATE CURRENT_TIMESTAMP)")
-        for asset in columns:
+
+    for asset in asset_names:
+        if not column_exists(mycursor, asset):
+            print("Adding column asset %s" % asset)
             mycursor.execute("ALTER TABLE assets ADD COLUMN \
-                              %s FLOAT NOT NULL" % asset)
+                            %s FLOAT NOT NULL" % asset)
     return mycursor
+
+
+def column_exists(mycursor, column_name):
+    mycursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS \
+                                    WHERE TABLE_SCHEMA='%s' \
+                                    AND TABLE_NAME='assets'\
+                                    AND COLUMN_NAME='%s'" %
+                     (data['database'], column_name))
+
+    return mycursor.fetchone()[0] != 0
 
 
 def insert_row(mycursor, mydb, quotes_list, coins):
@@ -61,16 +74,16 @@ def insert_row(mycursor, mydb, quotes_list, coins):
     mydb.commit()
 
 
-def print_table(mycursor):
-    # execute your query
-    mycursor.execute("SELECT * FROM assets")
+# def print_table(mycursor):
+#     # execute your query
+#     mycursor.execute("SELECT * FROM assets")
 
-    # fetch all the matching rows
-    result = mycursor.fetchall()
+#     # fetch all the matching rows
+#     result = mycursor.fetchall()
 
-    # loop through the rows
-    for row in result:
-        print(row)
-        print("\n")
+#     # loop through the rows
+#     for row in result:
+#         print(row)
+#         print("\n")
 
-    print("END")
+#     print("END")

@@ -1,3 +1,5 @@
+# TODO config validation (eg: csv/sql options)
+
 import requests
 import json
 import csv
@@ -60,7 +62,8 @@ def get_quote():
 
         append_csv(quotes_list, names_list)
     else:
-        print("Output mode error, please select in config.json the correct output mode (sql or csv)")
+        print("Output mode error, please select in config.json the correct"
+              + " output mode (sql or csv)")
 
 
 def append_csv(quotes, names):
