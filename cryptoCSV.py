@@ -1,5 +1,3 @@
-# TODO config validation (eg: csv/sql options)
-
 import requests
 import json
 import csv
@@ -19,7 +17,8 @@ currency = None
 
 def main():
     get_config()
-    while True:
+    check = output_error_check()
+    while check is True:
         get_quote()
         timer()
 
@@ -54,6 +53,10 @@ def get_quote():
 
     quotes_list = convert_ponds(quotes_list)
 
+    generate_output(quotes_list, names_list)
+
+
+def generate_output(quotes_list, names_list):
     if output == "sql":
         sql_output.save_to_database(names_list, quotes_list)
     elif output == "csv":
@@ -61,9 +64,7 @@ def get_quote():
         quotes_list = remove_brakets(quotes_list)
 
         append_csv(quotes_list, names_list)
-    else:
-        print("Output mode error, please select in config.json the correct"
-              + " output mode (sql or csv)")
+    return
 
 
 def append_csv(quotes, names):
@@ -107,6 +108,14 @@ def remove_brakets(info):
     x = x.replace('[', '')
     x = x.replace(']', '')
     return x
+
+
+def output_error_check():
+    if not output == "sql" or output == "csv":
+        print("Output mode error, please select in config.json the correct"
+              + " output mode (sql or csv)")
+        return False
+    return True
 
 
 main()
