@@ -14,6 +14,16 @@ A "config.json" file must be present with the following fields:
 * "currencies" - A list with all the Assets codes that will be tracked: ["BTC", "ETH"]
 * "api_key"/"currency_key" - private keys that allow access to APIs
 * "currency" - Currency in which the assets values will be presented: "GBP"
+* "output" - Type of output file that's going to be creaded/modified, supported file formats: CSV or SQL
+
+### configSQL.json
+
+A "configSQL.json" filme must be present with the following fields:
+
+* "host" - Host name of the SQL Database
+* "user" - User name for the database
+* "password" - Password to access the database
+* "database" - Name of the database being used
 
 ### Runing
 
@@ -21,4 +31,4 @@ A "config.json" file must be present with the following fields:
 python3 cryptoCSV.py
 ```
 
-After this command a CSV file will be created together with the first line of data and one new line with the current asset values will be generated every whole hour until the program is terminated.
+After this command either a CSV file will be created together with the first line of data and one new line with the current asset values will be generated every whole hour until the program is terminated or a SQL table will be creaded and updated in the same way.
